@@ -2,6 +2,7 @@
 #include "../../lavandula/include/utils.h"
 
 #include <limits.h>
+#include <string.h>
 #include <strings.h>
 
 static const char *DIST_DIR = "frontend/dist";
@@ -61,6 +62,10 @@ appRoute(static_assets, ctx) {
     }
 
     char fullpath[PATH_MAX];
+    size_t required = strlen(DIST_DIR) + 1 + strlen(relative);
+    if (required >= sizeof(fullpath)) {
+        return uriTooLong(strdup("Request path too long"), TEXT_PLAIN);
+    }
     snprintf(fullpath, sizeof(fullpath), "%s/%s", DIST_DIR, relative);
 
     FileBuffer buffer = readFileBuffer(fullpath);
