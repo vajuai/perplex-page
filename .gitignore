@@ -1,0 +1,12 @@
+# Build artifacts
+build/
+
+# Local binaries
+simpcurl
+
+# Rust/Trunk artifacts
+frontend/target/
+frontend/dist/
+
+# OS/editor files
+**/.DS_Store
