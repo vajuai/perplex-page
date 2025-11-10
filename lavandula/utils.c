@@ -4,29 +4,51 @@
 
 #include "include/utils.h"
 
-char *readFile(const char *path) {
-    FILE *fptr = fopen(path, "r");
+FileBuffer readFileBuffer(const char *path) {
+    FileBuffer buffer = {0};
+
+    FILE *fptr = fopen(path, "rb");
     if (!fptr) {
         printf("unable to open file: %s\n", path);
-        return NULL;
+        return buffer;
     }
 
-    fseek(fptr, 0, SEEK_END);
-    size_t sz = ftell(fptr);
+    if (fseek(fptr, 0, SEEK_END) != 0) {
+        fclose(fptr);
+        return buffer;
+    }
+
+    long sz = ftell(fptr);
+    if (sz < 0) {
+        fclose(fptr);
+        return buffer;
+    }
+
     rewind(fptr);
 
-    char *buff = malloc(sz + 1);
-    if (!buff) {
+    buffer.data = malloc((size_t)sz + 1);
+    if (!buffer.data) {
         fclose(fptr);
-        return NULL;
+        return buffer;
     }
 
-    if (fread(buff, 1, sz, fptr) != sz) {
+    size_t read = fread(buffer.data, 1, (size_t)sz, fptr);
+    if (read != (size_t)sz) {
         fclose(fptr);
-        return NULL;
+        free(buffer.data);
+        buffer.data = NULL;
+        buffer.length = 0;
+        return buffer;
     }
-    buff[sz] = '\0';
+
+    buffer.data[sz] = '\0';
+    buffer.length = (size_t)sz;
+
     fclose(fptr);
+    return buffer;
+}
 
-    return buff;
+char *readFile(const char *path) {
+    FileBuffer buffer = readFileBuffer(path);
+    return buffer.data;
 }

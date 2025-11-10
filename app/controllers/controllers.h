@@ -5,5 +5,6 @@
 
 appRoute(home, ctx);
 appRoute(search_api, ctx);
+appRoute(static_assets, ctx);
 
 #endif

@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+frontend/target
+frontend/dist
+target
+build
+simpcurl
+scripts
+.DS_Store

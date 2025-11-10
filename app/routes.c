@@ -4,4 +4,5 @@
 void registerRoutes(App *app) {
     root(app, home);
     get(app, "/api/search", search_api);
+    routeNotFound(app, static_assets);
 }

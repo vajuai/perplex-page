@@ -240,7 +240,14 @@ void runServer(App *app) {
             response.content = strdup("");
         }
 
-        int contentLength = strlen(response.content);
+        if (!response.contentType) {
+            response.contentType = TEXT_PLAIN;
+        }
+
+        size_t contentLength = response.contentLength;
+        if (contentLength == 0 && response.content) {
+            contentLength = strlen(response.content);
+        }
 
         const char *statusText = httpStatusCodeToStr(response.status);
 
@@ -248,7 +255,7 @@ void runServer(App *app) {
         snprintf(header, sizeof(header),
                 "HTTP/1.1 %d %s\r\n"
                 "Content-Type: %s\r\n"
-                "Content-Length: %d\r\n"
+                "Content-Length: %zu\r\n"
                 "Access-Control-Allow-Origin: *\r\n"
                 "Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS\r\n"
                 "Access-Control-Allow-Headers: *\r\n"
@@ -261,7 +268,7 @@ void runServer(App *app) {
             perror("write header failed");
             exit(EXIT_FAILURE);
         }
-        if (write(clientSocket, response.content, contentLength) == -1) {
+        if (contentLength > 0 && write(clientSocket, response.content, contentLength) == -1) {
             perror("write content failed");
             exit(EXIT_FAILURE);
         }
