@@ -120,7 +120,7 @@ void runServer(App *app) {
 
     struct sockaddr_in address = {0};
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
     address.sin_port = htons(app->server.port);
 
     if (bind(app->server.fileDescriptor, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -142,7 +142,7 @@ void runServer(App *app) {
     printf("┌───────────────────────────────────────────────┐\n");
     printf("│         🌿 Lavandula Server is RUNNING        │\n");
     printf("├───────────────────────────────────────────────┤\n");
-    printf("│ Listening on: http://127.0.0.1:%-12d   │\n", app->server.port);
+    printf("│ Listening on: http://0.0.0.0:%-12d     │\n", app->server.port);
     printf("│                                               │\n");
     printf("│ Controls:                                     │\n");
     printf("│   • Press 'r' to reload the server            │\n");
