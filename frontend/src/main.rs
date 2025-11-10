@@ -1,7 +1,19 @@
-use yew::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use gloo_net::http::Request;
 use web_sys::console;
+use yew::prelude::*;
+
+fn determine_api_base() -> String {
+    if let Some(window) = web_sys::window() {
+        if let Ok(origin) = window.location().origin() {
+            if origin.contains("127.0.0.1:8080") || origin.contains("localhost:8080") {
+                return "http://127.0.0.1:3000".to_string();
+            }
+            return origin;
+        }
+    }
+    "http://127.0.0.1:3000".to_string()
+}
 
 #[function_component(App)]
 fn app() -> Html {
@@ -28,7 +40,8 @@ fn app() -> Html {
 
             // minimal encoding: replace spaces with + (server decodes it)
             let q_enc = q.replace(' ', "+");
-            let url = format!("http://127.0.0.1:3000/api/search?q={}", q_enc);
+            let base = determine_api_base();
+            let url = format!("{}/api/search?q={}", base, q_enc);
             console::log_1(&format!("Fetching: {}", url).into());
 
             spawn_local(async move {

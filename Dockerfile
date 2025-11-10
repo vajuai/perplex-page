@@ -1,4 +1,22 @@
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim AS builder
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        pkg-config \
+        libcurl4-openssl-dev \
+        libsqlite3-dev \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+COPY . .
+
+RUN make \
+    && gcc simpcurl.c -lcurl -o simpcurl
+
+FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -9,9 +27,9 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY build/a ./build/a
-COPY simpcurl ./simpcurl
-COPY frontend/dist ./frontend/dist
+COPY --from=builder /src/build/a ./build/a
+COPY --from=builder /src/simpcurl ./simpcurl
+COPY --from=builder /src/frontend/dist ./frontend/dist
 COPY lavandula.yml ./lavandula.yml
 
 RUN chmod +x ./build/a ./simpcurl
