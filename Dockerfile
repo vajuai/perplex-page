@@ -13,8 +13,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN make \
-    && gcc simpcurl.c -lcurl -o simpcurl
+RUN make
 
 FROM debian:bookworm-slim AS runtime
 
@@ -29,7 +28,6 @@ WORKDIR /app
 
 COPY --from=builder /src/build/a ./build/a
 COPY --from=builder /src/simpcurl ./simpcurl
-COPY --from=builder /src/frontend/dist ./frontend/dist
 COPY --from=builder /src/frontend_htmx ./frontend_htmx
 COPY --from=builder /src/lavandula/build/liblavandula.a ./lib/liblavandula.a
 COPY lavandula.yml ./lavandula.yml
