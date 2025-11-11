@@ -3,19 +3,32 @@ APP_SRCS := \
 	app/routes.c \
 	$(wildcard app/controllers/*.c)
 
-LIB_DIR := lavandula/build
+LAV_SRC_DIR := lavandula/src
+LAV_BUILD_DIR := lavandula/build
 LIB_NAME := liblavandula.a
-LIB := $(LIB_DIR)/$(LIB_NAME)
+LIB := $(LAV_BUILD_DIR)/$(LIB_NAME)
+LAV_SRCS := $(shell find $(LAV_SRC_DIR) -name "*.c" ! -name "main.c")
+LAV_OBJS := $(patsubst $(LAV_SRC_DIR)/%.c,$(LAV_BUILD_DIR)/%.o,$(LAV_SRCS))
 
-APP_CFLAGS := -Wall -Wextra -Werror -fstack-protector-strong -Wstrict-overflow -Wformat-security -Wno-unused-parameter -D_FORTIFY_SOURCE=2 -O2 -Ilavandula/include
-APP_LDFLAGS := -L$(LIB_DIR) -llavandula -lsqlite3 -lpthread
+APP_CFLAGS := -Wall -Wextra -Werror -fstack-protector-strong -Wstrict-overflow -Wformat-security -Wno-unused-parameter -D_FORTIFY_SOURCE=2 -O2 -I$(LAV_SRC_DIR)/include
+APP_LDFLAGS := -L$(LAV_BUILD_DIR) -llavandula -lsqlite3 -lpthread
+LAV_CFLAGS := -Wall -Wextra -Werror -fstack-protector-strong -Wstrict-overflow -Wformat-security -Wno-unused-parameter -D_FORTIFY_SOURCE=2 -O2 -fPIC -I$(LAV_SRC_DIR)/include -I$(LAV_SRC_DIR)
 
 .PHONY: all app lib simpcurl clean
 
 all: app simpcurl
 
-lib:
-	$(MAKE) -C lavandula
+lib: $(LIB)
+
+$(LAV_BUILD_DIR):
+	mkdir -p $(LAV_BUILD_DIR)
+
+$(LAV_BUILD_DIR)/%.o: $(LAV_SRC_DIR)/%.c | $(LAV_BUILD_DIR)
+	mkdir -p $(dir $@)
+	$(CC) $(LAV_CFLAGS) -c $< -o $@
+
+$(LIB): $(LAV_OBJS)
+	ar rcs $@ $^
 
 app: lib
 	mkdir -p build

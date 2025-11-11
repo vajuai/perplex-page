@@ -1,4 +1,4 @@
-#include "../../lavandula/include/lavandula.h"
+#include "../../lavandula/src/include/lavandula.h"
 #include <errno.h>
 #include <ctype.h>
 
@@ -183,9 +183,7 @@ static HttpResponse build_search_response(const char *query, bool as_html) {
             }
             snprintf(html, needed, "<div class=\"error\">%s</div>", escaped);
             free(escaped);
-            HttpResponse resp = unauthorized(html, TEXT_HTML);
-            resp.contentLength = strlen(html);
-            return resp;
+            return unauthorized(html, TEXT_HTML);
         }
         return unauthorized(strdup((char *)msg), TEXT_PLAIN);
     }
@@ -209,17 +207,13 @@ static HttpResponse build_search_response(const char *query, bool as_html) {
             }
             snprintf(html, needed, "<div class=\"error\">%s</div>", escaped);
             free(escaped);
-            HttpResponse resp = serviceUnavailable(html, TEXT_HTML);
-            resp.contentLength = strlen(html);
-            return resp;
+            return serviceUnavailable(html, TEXT_HTML);
         }
         return serviceUnavailable(strdup((char *)fallback), TEXT_PLAIN);
     }
 
     if (!as_html) {
-        HttpResponse resp = ok(output, TEXT_PLAIN);
-        resp.contentLength = strlen(output);
-        return resp;
+        return ok(output, TEXT_PLAIN);
     }
 
     char *escaped = html_escape(output);
@@ -239,9 +233,7 @@ static HttpResponse build_search_response(const char *query, bool as_html) {
     snprintf(html, needed + 1, template, escaped);
     free(escaped);
 
-    HttpResponse resp = ok(html, TEXT_HTML);
-    resp.contentLength = strlen(html);
-    return resp;
+    return ok(html, TEXT_HTML);
 }
 
 appRoute(search_api, ctx) {

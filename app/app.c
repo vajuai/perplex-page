@@ -1,4 +1,4 @@
-#include "../lavandula/include/lavandula.h"
+#include "../lavandula/src/include/lavandula.h"
 #include "routes.h"
 
 int main() {

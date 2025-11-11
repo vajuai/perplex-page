@@ -1,0 +1,3 @@
+[submodule "lavandula"]
+	path = lavandula
+	url = https://github.com/ashtonjamesd/lavandula.git
