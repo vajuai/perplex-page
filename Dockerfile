@@ -31,6 +31,7 @@ COPY --from=builder /src/build/a ./build/a
 COPY --from=builder /src/simpcurl ./simpcurl
 COPY --from=builder /src/frontend/dist ./frontend/dist
 COPY --from=builder /src/frontend_htmx ./frontend_htmx
+COPY --from=builder /src/lavandula/build/liblavandula.a ./lib/liblavandula.a
 COPY lavandula.yml ./lavandula.yml
 
 RUN chmod +x ./build/a ./simpcurl

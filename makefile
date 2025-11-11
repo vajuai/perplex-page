@@ -1,25 +1,29 @@
-# Minimal set of Lavandula sources required for this project
-SRCS_LAVANDULA = \
-	lavandula/server.c \
-	lavandula/router.c \
-	lavandula/http.c \
-	lavandula/request_context.c \
-	lavandula/middleware.c \
-	lavandula/json.c \
-	lavandula/cors.c \
-	lavandula/utils.c \
-	lavandula/lavandula.c \
-	lavandula/dotenv.c \
-	lavandula/sql.c \
-	lavandula/auth.c \
-	lavandula/base64.c \
-	lavandula/api_response.c
+APP_SRCS := \
+	app/app.c \
+	app/routes.c \
+	$(wildcard app/controllers/*.c)
 
-SRCS = app/app.c app/routes.c $(wildcard app/controllers/*.c) $(wildcard app/middleware/*.c)
+LIB_DIR := lavandula/build
+LIB_NAME := liblavandula.a
+LIB := $(LIB_DIR)/$(LIB_NAME)
 
-# Hardened compile flags
-CFLAGS = -Wall -Wextra -Werror -fstack-protector-strong -Wstrict-overflow -Wformat-security -Wno-unused-parameter -D_FORTIFY_SOURCE=2 -O2 -lsqlite3 -Isrc -Ilavandula/include
+APP_CFLAGS := -Wall -Wextra -Werror -fstack-protector-strong -Wstrict-overflow -Wformat-security -Wno-unused-parameter -D_FORTIFY_SOURCE=2 -O2 -Ilavandula/include
+APP_LDFLAGS := -L$(LIB_DIR) -llavandula -lsqlite3 -lpthread
 
-all:
+.PHONY: all app lib simpcurl clean
+
+all: app simpcurl
+
+lib:
+	$(MAKE) -C lavandula
+
+app: lib
 	mkdir -p build
-	gcc $(SRCS) $(SRCS_LAVANDULA) $(CFLAGS) -o build/a
+	$(CC) $(APP_SRCS) $(APP_CFLAGS) -o build/a $(APP_LDFLAGS)
+
+simpcurl:
+	$(CC) simpcurl.c -lcurl -o simpcurl
+
+clean:
+	rm -rf build simpcurl
+	$(MAKE) -C lavandula clean
