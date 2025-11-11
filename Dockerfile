@@ -30,6 +30,7 @@ WORKDIR /app
 COPY --from=builder /src/build/a ./build/a
 COPY --from=builder /src/simpcurl ./simpcurl
 COPY --from=builder /src/frontend/dist ./frontend/dist
+COPY --from=builder /src/frontend_htmx ./frontend_htmx
 COPY lavandula.yml ./lavandula.yml
 
 RUN chmod +x ./build/a ./simpcurl
